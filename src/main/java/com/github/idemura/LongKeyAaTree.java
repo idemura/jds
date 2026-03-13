@@ -25,17 +25,8 @@ public class LongKeyAaTree<T> {
   }
 
   public T get(long key) {
-    var node = root;
-    while (node != null) {
-      if (key < node.key) {
-        node = node.left;
-      } else if (key > node.key) {
-        node = node.right;
-      } else {
-        return node.value;
-      }
-    }
-    return null;
+    var node = findNode(key);
+    return node == null ? null : node.value;
   }
 
   public void put(long key, T value) {
@@ -55,6 +46,20 @@ public class LongKeyAaTree<T> {
     }
     verifySearchTreeRec(root, null, null);
     verifyAaRec(root);
+  }
+
+  private Node<T> findNode(long key) {
+    var node = root;
+    while (node != null) {
+      if (key < node.key) {
+        node = node.left;
+      } else if (key > node.key) {
+        node = node.right;
+      } else {
+        return node;
+      }
+    }
+    return null;
   }
 
   private Node<T> putRecStep(Node<T> node, long key, T value) {
