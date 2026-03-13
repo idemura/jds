@@ -1,6 +1,6 @@
 package com.github.idemura;
 
-public class LongKeyAaTreeWithParent<T> {
+public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
   static class Node<T> {
     Long key; // Boxing for fair benchmark.
     int depth;
@@ -46,7 +46,7 @@ public class LongKeyAaTreeWithParent<T> {
     }
   }
 
-  void verify() {
+  public void verify() {
     int actualSize = countRec(root);
     if (actualSize != size) {
       throw newVerificationException("Size mismatch: expected=%d, actual=%d", size, actualSize);
