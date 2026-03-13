@@ -49,10 +49,11 @@ public class LongKeyAaTree<T> {
   }
 
   void verify() {
-    int actualSize = verifySearchTreeRec(root, null, null);
+    int actualSize = countRec(root);
     if (actualSize != size) {
       throw newVerificationException("Size mismatch: expected=%d, actual=%d", size, actualSize);
     }
+    verifySearchTreeRec(root, null, null);
     verifyAaRec(root);
   }
 
@@ -128,10 +129,10 @@ public class LongKeyAaTree<T> {
     return node;
   }
 
-  private static <T> int verifySearchTreeRec(
+  private static <T> void verifySearchTreeRec(
       Node<T> node, Long minKeyExclusive, Long maxKeyExclusive) {
     if (node == null) {
-      return 0;
+      return;
     }
     if (minKeyExclusive != null && node.key <= minKeyExclusive) {
       throw newVerificationException("BST violation at key=%d", node.key);
@@ -139,9 +140,8 @@ public class LongKeyAaTree<T> {
     if (maxKeyExclusive != null && node.key >= maxKeyExclusive) {
       throw newVerificationException("BST violation at key=%d", node.key);
     }
-    int leftCount = verifySearchTreeRec(node.left, minKeyExclusive, node.key);
-    int rightCount = verifySearchTreeRec(node.right, node.key, maxKeyExclusive);
-    return leftCount + rightCount + 1;
+    verifySearchTreeRec(node.left, minKeyExclusive, node.key);
+    verifySearchTreeRec(node.right, node.key, maxKeyExclusive);
   }
 
   private static <T> void verifyAaRec(Node<T> node) {
@@ -174,6 +174,13 @@ public class LongKeyAaTree<T> {
 
   private static <T> int getDepth(Node<T> node) {
     return node == null ? 0 : node.depth;
+  }
+
+  private static <T> int countRec(Node<T> node) {
+    if (node == null) {
+      return 0;
+    }
+    return 1 + countRec(node.left) + countRec(node.right);
   }
 
   private static IllegalArgumentException newVerificationException(String message, Object... args) {
