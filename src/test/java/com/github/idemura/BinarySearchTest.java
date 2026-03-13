@@ -3,9 +3,10 @@ package com.github.idemura;
 import static com.github.idemura.BinarySearch.findLeft;
 import static com.github.idemura.BinarySearch.findRight;
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.tinylog.Logger;
-import java.util.Arrays;
 
 class BinarySearchTest {
   @Test

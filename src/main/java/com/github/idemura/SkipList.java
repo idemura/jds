@@ -53,7 +53,7 @@ public class SkipList<V> {
 
     h--; // 0-based index
     var p = root;
-    for (;;) {
+    for (; ; ) {
       boolean levelDown = false;
       if (p.next[h] == null) {
         // We are at the end of the list. Insert and move to the level below.

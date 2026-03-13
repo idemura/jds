@@ -2,6 +2,7 @@ package com.github.idemura;
 
 import static com.github.idemura.Substring.*;
 import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.Test;
 
 class SubstringTest {
