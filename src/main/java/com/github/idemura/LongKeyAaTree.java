@@ -11,6 +11,7 @@ public class LongKeyAaTree<T> {
     Node(long key, T value) {
       this.key = key;
       this.value = value;
+      this.depth = 1;
     }
   }
 
@@ -90,21 +91,21 @@ public class LongKeyAaTree<T> {
 
     if (key < node.key) {
       node.left = removeRecStep(node.left, key);
-      if (node.left != null && node.left.depth < node.depth - 1) {
+      if (getDepth(node.left) < node.depth - 1) {
         // node.right != null here.
         int d = node.depth;
         node.depth--;
-        if (node.right.depth == d) {
+        if (getDepth(node.right) == d) {
           return promoteRight(node);
         }
-        if (node.right.right != null && node.right.right.depth == d - 1) {
+        if (node.right != null && getDepth(node.right.right) == d - 1) {
           node = promoteRight(node);
           node.depth++;
         }
       }
     } else if (key > node.key) {
       node.right = removeRecStep(node.right, key);
-      if (node.right != null && node.right.depth < node.depth - 1) {
+      if (getDepth(node.right) < node.depth - 1) {
         node.depth--;
         return promoteLeft(node);
       }
@@ -147,36 +148,32 @@ public class LongKeyAaTree<T> {
     if (node == null) {
       return;
     }
-    if (node.depth < 0) {
-      throw newVerificationException("Negative depth at key=%d", node.key);
+    if (node.depth < 1) {
+      throw newVerificationException("Invalid depth at key=%d", node.key);
     }
 
-    // Left child must be exactly one level lower; for depth=0, left must be null.
-    if (node.left != null) {
-      if (node.left.depth != node.depth - 1) {
-        throw newVerificationException("Invalid left depth at key=%d", node.key);
-      }
-    } else if (node.depth > 0) {
-      // Non-leaf levels must have a left child.
-      throw newVerificationException("Missing left child at key=%d", node.key);
+    // Left child must be exactly one level lower.
+    if (getDepth(node.left) != node.depth - 1) {
+      throw newVerificationException("Invalid left depth at key=%d", node.key);
     }
 
     // Right child must be at same level or one lower.
-    if (node.right != null) {
-      if (node.right.depth != node.depth && node.right.depth != node.depth - 1) {
-        throw newVerificationException("Invalid right depth at key=%d", node.key);
-      }
-      // Right-right child cannot be on the same level as node.
-      if (node.right.right != null && node.right.right.depth >= node.depth) {
-        throw newVerificationException("Right-right depth violation at key=%d", node.key);
-      }
-    } else if (node.depth > 0) {
-      // Non-leaf levels must have a right child.
-      throw newVerificationException("Missing right child at key=%d", node.key);
+    int rightDepth = getDepth(node.right);
+    if (rightDepth != node.depth && rightDepth != node.depth - 1) {
+      throw newVerificationException("Invalid right depth at key=%d", node.key);
+    }
+
+    // Right-right child cannot be on the same level as node.
+    if (getDepth(node.right == null ? null : node.right.right) >= node.depth) {
+      throw newVerificationException("Invalid right-right depth at key=%d", node.key);
     }
 
     verifyAaRec(node.left);
     verifyAaRec(node.right);
+  }
+
+  private static <T> int getDepth(Node<T> node) {
+    return node == null ? 0 : node.depth;
   }
 
   private static IllegalArgumentException newVerificationException(String message, Object... args) {
@@ -184,14 +181,14 @@ public class LongKeyAaTree<T> {
   }
 
   private static <T> Node<T> skew(Node<T> node) {
-    if (node.left != null && node.left.depth == node.depth) {
+    if (getDepth(node.left) == node.depth) {
       return promoteLeft(node);
     }
     return node;
   }
 
   private static <T> Node<T> split(Node<T> node) {
-    if (node.right != null && node.right.right != null && node.right.right.depth == node.depth) {
+    if (node.right != null && getDepth(node.right.right) == node.depth) {
       node = promoteRight(node);
       node.depth++;
       return node;
