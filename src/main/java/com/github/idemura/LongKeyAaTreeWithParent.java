@@ -9,10 +9,11 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     Node<T> left;
     Node<T> right;
 
-    Node(long key, T value) {
+    Node(long key, T value, Node<T> parent) {
       this.key = key;
-      this.value = value;
       this.depth = 1;
+      this.value = value;
+      this.parent = parent;
     }
   }
 
@@ -31,9 +32,33 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
   }
 
   public void put(long key, T value) {
-    // Size is updated exactly at node creation in putRecStep.
-    root = putRecStep(root, key, value);
-    root.parent = null;
+    if (root == null) {
+      root = new Node<>(key, value, null);
+      size++;
+      return;
+    }
+
+    var node = root;
+    while (true) {
+      if (key < node.key) {
+        if (node.left == null) {
+          node.left = new Node<>(key, value, node);
+          break;
+        }
+        node = node.left;
+      } else if (key > node.key) {
+        if (node.right == null) {
+          node.right = new Node<>(key, value, node);
+          break;
+        }
+        node = node.right;
+      } else {
+        node.value = value;
+        return;
+      }
+    }
+    size++;
+    rebalanceAfterInsert(node);
   }
 
   public void remove(long key) {
@@ -68,33 +93,31 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     return null;
   }
 
-  private Node<T> putRecStep(Node<T> node, long key, T value) {
-    if (node == null) {
-      size++;
-      return new Node<>(key, value);
-    }
+  private void rebalanceAfterInsert(Node<T> node) {
+    int sameCount = 0;
+    while (node != null) {
+      var parent = node.parent;
 
-    if (key < node.key) {
-      node.left = putRecStep(node.left, key, value);
-      node.left.parent = node;
-    } else if (key > node.key) {
-      node.right = putRecStep(node.right, key, value);
-      node.right.parent = node;
-    } else {
-      node.value = value;
-      return node;
-    }
+      // AA-tree rebalancing after insert:
+      // 1) skew: fix left child rule violation,
+      // 2) split: fix right-right grand child rule violation.
+      int d = node.depth;
+      var top = split(skew(node));
+      replaceChild(parent, node, top);
+      if (parent == null) {
+        root = top;
+        root.parent = null;
+      }
+      if (top == node && top.depth == d) {
+        if (sameCount++ == 2) {
+          return;
+        }
+      } else {
+        sameCount = 0;
+      }
 
-    // AA-tree rebalancing after recursive insert:
-    // 1) skew: fix left child rule violation,
-    // 2) split: fix right-right grand child rule violation.
-    //
-    // Note on transient states:
-    // After inserting into the left subtree, its root may be promoted to this node's depth (d),
-    // so we can briefly have node.left.depth == node.depth. In that promotion shape,
-    // node.left.right is expected to be depth (d-1), so skew fixes the violation without
-    // introducing a new left horizontal link at the rotated-down node.
-    return split(skew(node));
+      node = top.parent;
+    }
   }
 
   private Node<T> removeRecStep(Node<T> node, long key) {
@@ -241,6 +264,20 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
 
   static IllegalArgumentException newVerificationException(String message, Object... args) {
     return new IllegalArgumentException(message.formatted(args));
+  }
+
+  private static <T> void replaceChild(Node<T> parent, Node<T> oldChild, Node<T> newChild) {
+    if (parent == null) {
+      return;
+    }
+    if (parent.left == oldChild) {
+      parent.left = newChild;
+    } else if (parent.right == oldChild) {
+      parent.right = newChild;
+    } else {
+      throw newVerificationException("Parent does not reference child at key=%d", oldChild.key);
+    }
+    newChild.parent = parent;
   }
 
   static <T> Node<T> skew(Node<T> node) {

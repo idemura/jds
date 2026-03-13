@@ -1,17 +1,16 @@
 package com.github.idemura;
 
 import static org.junit.jupiter.api.Assertions.*;
-
+import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
-import org.junit.jupiter.api.Test;
 
 class LongKeyAaTreeTest {
   private final LongKeyTree<String> tree = createTree();
 
   private static LongKeyTree<String> createTree() {
-    return new LongKeyAaTree<>();
+    return new LongKeyAaTreeWithParent<>();
   }
 
   private void put(long key) {
@@ -195,7 +194,7 @@ class LongKeyAaTreeTest {
       for (int n = 0; n < 100; n++) {
         var keys = new ArrayList<Long>();
         for (int i = 0; i < size; i++) {
-          keys.add(random.nextLong());
+          keys.add((long) random.nextInt());
         }
 
         var tree = createTree();
@@ -222,7 +221,7 @@ class LongKeyAaTreeTest {
       int n = random.nextInt(500);
       var keys = new ArrayList<Long>(n);
       for (int i = 0; i < n; i++) {
-        keys.add(random.nextLong());
+        keys.add((long) random.nextInt());
       }
 
       // With this set of keys, try different orders of insert/remove.
