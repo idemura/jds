@@ -1,8 +1,10 @@
 package com.github.idemura;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 
 class LongKeyAaTreeTest {
   private final LongKeyAaTree<String> tree = new LongKeyAaTree<>();
@@ -179,5 +181,61 @@ class LongKeyAaTreeTest {
     assertEquals(7, tree.size());
     assertNotFound(10, 20, 30);
     assertContains(50, 60, 65, 70, 80, 85, 90);
+  }
+
+  @Test
+  void testRandomizedSmallShapes() {
+    var random = new Random(1);
+    for (int size = 0; size <= 8; size++) {
+      for (int n = 0; n < 100; n++) {
+        var keys = new ArrayList<Long>();
+        for (int i = 0; i < size; i++) {
+          keys.add(random.nextLong());
+        }
+
+        var tree = new LongKeyAaTree<String>();
+        for (long key : keys) {
+          tree.put(key, Long.toString(key));
+        }
+        tree.verify();
+
+        Collections.shuffle(keys, random);
+        for (long key : keys) {
+          tree.remove(key);
+          tree.verify();
+        }
+        assertEquals(0, tree.size());
+      }
+    }
+  }
+
+  @Test
+  void testRandomizedInsertThenRemove() {
+    var random = new Random(1);
+    for (int seed = 0; seed < 100; seed++) {
+
+      int n = random.nextInt(500);
+      var keys = new ArrayList<Long>(n);
+      for (int i = 0; i < n; i++) {
+        keys.add(random.nextLong());
+      }
+
+      // With this set of keys, try different orders of insert/remove.
+      for (int k = 0; k < 50; k++) {
+        var tree = new LongKeyAaTree<String>();
+        for (long key : keys) {
+          tree.put(key, Long.toString(key));
+        }
+        tree.verify();
+
+        Collections.shuffle(keys, random);
+        for (long key : keys) {
+          tree.remove(key);
+          tree.verify();
+        }
+
+        assertEquals(0, tree.size());
+      }
+    }
   }
 }
