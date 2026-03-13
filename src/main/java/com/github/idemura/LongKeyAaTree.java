@@ -188,7 +188,7 @@ public class LongKeyAaTree<T> {
     if (node == null) {
       return 0;
     }
-    return 1 + countRec(node.left) + countRec(node.right);
+    return countRec(node.left) + countRec(node.right) + 1;
   }
 
   static <T> int getDepth(Node<T> node) {
