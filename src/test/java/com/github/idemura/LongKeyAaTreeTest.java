@@ -10,7 +10,7 @@ class LongKeyAaTreeTest {
   private final LongKeyTree<String> tree = createTree();
 
   private static LongKeyTree<String> createTree() {
-    return new LongKeyAaTreeWithParent<>();
+    return new LongKeyAaTree<>();
   }
 
   private void put(long key) {
