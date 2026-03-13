@@ -33,9 +33,7 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
   public void put(long key, T value) {
     // Size is updated exactly at node creation in putRecStep.
     root = putRecStep(root, key, value);
-    if (root != null) {
-      root.parent = null;
-    }
+    root.parent = null;
   }
 
   public void remove(long key) {
@@ -51,6 +49,7 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     if (actualSize != size) {
       throw newVerificationException("Size mismatch: expected=%d, actual=%d", size, actualSize);
     }
+    verifyParentRec(root, null);
     verifySearchTreeRec(root, null, null);
     verifyAaRec(root);
   }
@@ -212,6 +211,17 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
       return 0;
     }
     return countRec(node.left) + countRec(node.right) + 1;
+  }
+
+  static <T> void verifyParentRec(Node<T> node, Node<T> expectedParent) {
+    if (node == null) {
+      return;
+    }
+    if (node.parent != expectedParent) {
+      throw newVerificationException("Invalid parent at key=%d", node.key);
+    }
+    verifyParentRec(node.left, node);
+    verifyParentRec(node.right, node);
   }
 
   static <T> int getDepth(Node<T> node) {
