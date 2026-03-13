@@ -90,40 +90,47 @@ public class LongKeyAaTree<T> {
       return null;
     }
 
-    if (key < node.key) {
-      node.left = removeRecStep(node.left, key);
-      if (getDepth(node.left) < node.depth - 1) {
-        // node.right != null here.
-        int d = node.depth;
-        node.depth--;
-        if (getDepth(node.right) == d) {
-          return promoteRight(node);
+    if (key <= node.key) {
+      if (key == node.key) {
+        // If node doesn't have left child, delete it. Otherwise, find the rightmost node (rm)
+        // in the left subtree and copy the key and the value in this node. Remove rm.key instead.
+        if (node.left == null) {
+          size--;
+          return node.right;
         }
-        if (node.right != null && getDepth(node.right.right) == d - 1) {
-          node = promoteRight(node);
-          node.depth++;
+        var rm = node.left;
+        while (rm.right != null) {
+          rm = rm.right;
+        }
+        node.key = rm.key;
+        node.value = rm.value;
+        node.left = removeRecStep(node.left, rm.key);
+      } else {
+        node.left = removeRecStep(node.left, key);
+      }
+      if (getDepth(node.left) < node.depth - 1) {
+        // Consider two cases: right and right-right.
+        int d = node.depth--;
+        if (getDepth(node.right) < d) {
+          // We only need to split.
+          return split(node);
+        } else {
+          // Right-right case. Promote node with greater depth up.
+          var top = promoteRight(node);
+          // Split left child, skew after.
+          top.left = split(top.left);
+          return skew(top);
         }
       }
-    } else if (key > node.key) {
+    } else {
       node.right = removeRecStep(node.right, key);
       if (getDepth(node.right) < node.depth - 1) {
         node.depth--;
-        return promoteLeft(node);
-      }
-    } else {
-      // If node doesn't have left child, delete it. Otherwise, find the rightmost node (rm) in
-      // the left subtree and copy key and value in this node. Remove rm.key instead.
-      if (node.left == null) {
-        size--;
-        return node.right;
-      } else {
-        var t = node.left;
-        while (t.right != null) {
-          t = t.right;
+        var top = skew(node);
+        if (top.right != null) {
+          top.right = skew(top.right);
         }
-        node.key = t.key;
-        node.value = t.value;
-        node.left = removeRecStep(node.left, t.key);
+        return split(top);
       }
     }
     return node;
@@ -172,15 +179,15 @@ public class LongKeyAaTree<T> {
     verifyAaRec(node.right);
   }
 
-  private static <T> int getDepth(Node<T> node) {
-    return node == null ? 0 : node.depth;
-  }
-
   private static <T> int countRec(Node<T> node) {
     if (node == null) {
       return 0;
     }
     return 1 + countRec(node.left) + countRec(node.right);
+  }
+
+  private static <T> int getDepth(Node<T> node) {
+    return node == null ? 0 : node.depth;
   }
 
   private static IllegalArgumentException newVerificationException(String message, Object... args) {
