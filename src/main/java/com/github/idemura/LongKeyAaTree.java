@@ -152,14 +152,13 @@ public class LongKeyAaTree<T> {
     }
 
     // Left child must be exactly one level lower; for depth=0, left must be null.
-    if (node.depth == 0) {
-      if (node.left != null) {
-        throw newVerificationException("Left child is not allowed at depth=0, key=%d", node.key);
-      }
-    } else {
-      if (node.left == null || node.left.depth != node.depth - 1) {
+    if (node.left != null) {
+      if (node.left.depth != node.depth - 1) {
         throw newVerificationException("Invalid left depth at key=%d", node.key);
       }
+    } else if (node.depth > 0) {
+      // Non-leaf levels must have a left child.
+      throw newVerificationException("Missing left child at key=%d", node.key);
     }
 
     // Right child must be at same level or one lower.
