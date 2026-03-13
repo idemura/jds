@@ -1,7 +1,7 @@
 package com.github.idemura;
 
 public class LongKeyAaTree<T> {
-  private static class Node<T> {
+  static class Node<T> {
     long key;
     int depth;
     T value;
@@ -92,49 +92,57 @@ public class LongKeyAaTree<T> {
 
     if (key <= node.key) {
       if (key == node.key) {
-        // If node doesn't have left child, delete it. Otherwise, find the rightmost node (rm)
-        // in the left subtree and copy the key and the value in this node. Remove rm.key instead.
+        // If node doesn't have left child, delete it. Otherwise, find the predecessor and copy
+        // the key and the value in this node. Remove predecessor's key instead.
         if (node.left == null) {
           size--;
           return node.right;
         }
-        var rm = findRightmostNode(node.left);
-        node.key = rm.key;
-        node.value = rm.value;
-        node.left = removeRecStep(node.left, rm.key);
+        var pred = findPredecessor(node);
+        node.key = pred.key;
+        node.value = pred.value;
+        node.left = removeRecStep(node.left, pred.key);
       } else {
         node.left = removeRecStep(node.left, key);
       }
-      if (getDepth(node.left) < node.depth - 1) {
-        // Consider two cases: right and right-right.
-        int d = node.depth--;
-        if (getDepth(node.right) < d) {
-          // We only need to split.
-          return split(node);
-        } else {
-          // Right-right case. Promote node with greater depth up.
-          var top = promoteRight(node);
-          // Split left child, skew after.
-          top.left = split(top.left);
-          return skew(top);
-        }
-      }
+      return rebalanceAfterDeleteLeft(node);
     } else {
       node.right = removeRecStep(node.right, key);
-      if (getDepth(node.right) < node.depth - 1) {
-        node.depth--;
-        var top = skew(node);
-        if (top.right != null) {
-          top.right = skew(top.right);
-        }
-        return split(top);
+      return rebalanceAfterDeleteRight(node);
+    }
+  }
+
+  static <T> Node<T> rebalanceAfterDeleteLeft(Node<T> node) {
+    if (getDepth(node.left) < node.depth - 1) {
+      // Consider two cases: right and right-right.
+      int d = node.depth--;
+      if (getDepth(node.right) < d) {
+        // We only need to split.
+        return split(node);
+      } else {
+        // Right-right case. Promote node with greater depth up.
+        var top = promoteRight(node);
+        // Split left child, skew after.
+        top.left = split(top.left);
+        return skew(top);
       }
     }
     return node;
   }
 
-  private static <T> void verifySearchTreeRec(
-      Node<T> node, Long minKeyExclusive, Long maxKeyExclusive) {
+  static <T> Node<T> rebalanceAfterDeleteRight(Node<T> node) {
+    if (getDepth(node.right) < node.depth - 1) {
+      node.depth--;
+      var top = skew(node);
+      if (top.right != null) {
+        top.right = skew(top.right);
+      }
+      return split(top);
+    }
+    return node;
+  }
+
+  static <T> void verifySearchTreeRec(Node<T> node, Long minKeyExclusive, Long maxKeyExclusive) {
     if (node == null) {
       return;
     }
@@ -148,7 +156,7 @@ public class LongKeyAaTree<T> {
     verifySearchTreeRec(node.right, node.key, maxKeyExclusive);
   }
 
-  private static <T> void verifyAaRec(Node<T> node) {
+  static <T> void verifyAaRec(Node<T> node) {
     if (node == null) {
       return;
     }
@@ -176,36 +184,40 @@ public class LongKeyAaTree<T> {
     verifyAaRec(node.right);
   }
 
-  private static <T> int countRec(Node<T> node) {
+  static <T> int countRec(Node<T> node) {
     if (node == null) {
       return 0;
     }
     return 1 + countRec(node.left) + countRec(node.right);
   }
 
-  private static <T> int getDepth(Node<T> node) {
+  static <T> int getDepth(Node<T> node) {
     return node == null ? 0 : node.depth;
   }
 
-  private static <T> Node<T> findRightmostNode(Node<T> node) {
+  static <T> Node<T> findPredecessor(Node<T> node) {
+    if (node.left == null) {
+      return null;
+    }
+    node = node.left;
     while (node.right != null) {
       node = node.right;
     }
     return node;
   }
 
-  private static IllegalArgumentException newVerificationException(String message, Object... args) {
+  static IllegalArgumentException newVerificationException(String message, Object... args) {
     return new IllegalArgumentException(message.formatted(args));
   }
 
-  private static <T> Node<T> skew(Node<T> node) {
+  static <T> Node<T> skew(Node<T> node) {
     if (getDepth(node.left) == node.depth) {
       return promoteLeft(node);
     }
     return node;
   }
 
-  private static <T> Node<T> split(Node<T> node) {
+  static <T> Node<T> split(Node<T> node) {
     if (node.right != null && getDepth(node.right.right) == node.depth) {
       node = promoteRight(node);
       node.depth++;
@@ -214,14 +226,14 @@ public class LongKeyAaTree<T> {
     return node;
   }
 
-  private static <T> Node<T> promoteLeft(Node<T> node) {
+  static <T> Node<T> promoteLeft(Node<T> node) {
     var left = node.left;
     node.left = left.right;
     left.right = node;
     return left;
   }
 
-  private static <T> Node<T> promoteRight(Node<T> node) {
+  static <T> Node<T> promoteRight(Node<T> node) {
     var right = node.right;
     node.right = right.left;
     right.left = node;
