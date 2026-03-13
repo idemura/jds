@@ -2,7 +2,7 @@ package com.github.idemura;
 
 public class LongKeyAaTree<T> {
   static class Node<T> {
-    long key;
+    Long key; // Boxing for fair benchmark.
     int depth;
     T value;
     Node<T> left;
