@@ -98,10 +98,7 @@ public class LongKeyAaTree<T> {
           size--;
           return node.right;
         }
-        var rm = node.left;
-        while (rm.right != null) {
-          rm = rm.right;
-        }
+        var rm = findRightmostNode(node.left);
         node.key = rm.key;
         node.value = rm.value;
         node.left = removeRecStep(node.left, rm.key);
@@ -188,6 +185,13 @@ public class LongKeyAaTree<T> {
 
   private static <T> int getDepth(Node<T> node) {
     return node == null ? 0 : node.depth;
+  }
+
+  private static <T> Node<T> findRightmostNode(Node<T> node) {
+    while (node.right != null) {
+      node = node.right;
+    }
+    return node;
   }
 
   private static IllegalArgumentException newVerificationException(String message, Object... args) {
