@@ -3,15 +3,10 @@ package com.github.idemura;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.random.RandomGenerator;
 
 class LongKeySkipListTest {
   private static LongKeyMap<String> createSkipList() {
-    return createSkipList(null);
-  }
-
-  private static LongKeyMap<String> createSkipList(RandomGenerator random) {
-    return new LongKeySkipList<>(random);
+    return new LongKeySkipList<>();
   }
 
   @Test
