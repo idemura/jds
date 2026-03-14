@@ -5,7 +5,7 @@ import java.util.random.RandomGenerator;
 
 public class LongKeySkipList<V> implements LongKeyMap<V> {
   static class Node {
-    long key;
+    Long key; // Boxing for fair benchmark.
     Node[] next;
     Object value;
 
@@ -33,48 +33,31 @@ public class LongKeySkipList<V> implements LongKeyMap<V> {
 
   @Override
   public void put(long key, V value) {
-    // Check if we replace the value
-    var keyNode = findNode(heads, key);
-    if (keyNode != null) {
-      keyNode.value = value;
+    var prev = new Node[MAX_HEIGHT];
+    var p = heads;
+
+    // Walk from the highest level down once, collecting insertion predecessors.
+    for (int h = MAX_HEIGHT - 1; h >= 0; h--) {
+      while (p.next[h] != null && p.next[h].key < key) {
+        p = p.next[h];
+      }
+      prev[h] = p;
+    }
+
+    // At level 0 we can tell whether this is an update or a true insert.
+    var next0 = prev[0].next[0];
+    if (next0 != null && next0.key == key) {
+      next0.value = value;
       return;
     }
 
-    // Generate a new node
     int h = randomHeight();
     var newNode = new Node(key, value, h);
-
-    h--; // 0-based index
-    var p = heads;
-    while (true) {
-      boolean levelDown = false;
-      if (p.next[h] == null) {
-        // We are at the end of the list. Insert and move to the level below.
-        p.next[h] = newNode;
-        levelDown = true;
-      } else {
-        if (p.next[h].key < key) {
-          p = p.next[h];
-        } else {
-          if (p.next[h].key == key) {
-            // Update value
-            p.next[h].value = value;
-          } else {
-            // Insert here and move to the level below.
-            newNode.next[h] = p.next[h];
-            p.next[h] = newNode;
-          }
-          levelDown = true;
-        }
-      }
-      if (levelDown) {
-        if (h == 0) {
-          break;
-        } else {
-          h--;
-        }
-      }
+    for (int i = 0; i < h; i++) {
+      newNode.next[i] = prev[i].next[i];
+      prev[i].next[i] = newNode;
     }
+
     size++;
   }
 
@@ -97,21 +80,6 @@ public class LongKeySkipList<V> implements LongKeyMap<V> {
   @Override
   public void verify() {
     throw new UnsupportedOperationException();
-  }
-
-  String toDebugString() {
-    var sb = new StringBuilder();
-    for (int i = 0; i < MAX_HEIGHT; i++) {
-      if (heads.next[i] == null) {
-        break;
-      }
-      sb.append("L").append(i).append(": ");
-      for (var p = heads.next[i]; p != null; p = p.next[i]) {
-        sb.append(p.key).append("(").append(p.value).append(") ");
-      }
-      sb.append("\n");
-    }
-    return sb.toString();
   }
 
   private int randomHeight() {

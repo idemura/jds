@@ -34,15 +34,6 @@ public class LongKeySkipListBenchmark {
     return skipList;
   }
 
-  @Benchmark
-  public Object skipList2Insert(InsertState state) {
-    var skipList = new LongKeySkipList2<String>();
-    for (long key : state.keys) {
-      skipList.put(key, "dummy");
-    }
-    return skipList;
-  }
-
   private static ArrayList<Long> makeKeys(Random random, int size) {
     var keys = new ArrayList<Long>(size);
     for (int i = 0; i < size; i++) {
