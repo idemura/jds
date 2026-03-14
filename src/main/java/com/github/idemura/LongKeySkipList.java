@@ -3,7 +3,7 @@ package com.github.idemura;
 import java.util.Random;
 import java.util.random.RandomGenerator;
 
-public class LongKeySkipList<V> {
+public class LongKeySkipList<V> implements LongKeyMap<V> {
   static class Node {
     long key;
     Node[] next;
@@ -20,6 +20,7 @@ public class LongKeySkipList<V> {
 
   private final RandomGenerator random;
   private final Node heads;
+  private int size;
 
   LongKeySkipList() {
     this(new Random(1));
@@ -38,9 +39,10 @@ public class LongKeySkipList<V> {
     return h;
   }
 
+  @Override
   public void put(long key, V value) {
     // Check if we replace the value
-    var keyNode = findNode(key);
+    var keyNode = findNode(heads, key);
     if (keyNode != null) {
       keyNode.value = value;
       return;
@@ -81,11 +83,28 @@ public class LongKeySkipList<V> {
         }
       }
     }
+    size++;
   }
 
+  @Override
+  public int size() {
+    return size;
+  }
+
+  @Override
   public V get(long key) {
-    var keyNode = findNode(key);
-    return keyNode == null ? null : (V) keyNode.value;
+    var node = findNode(heads, key);
+    return node == null ? null : (V) node.value;
+  }
+
+  @Override
+  public void remove(long key) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void verify() {
+    throw new UnsupportedOperationException();
   }
 
   String toDebugString() {
@@ -103,7 +122,7 @@ public class LongKeySkipList<V> {
     return sb.toString();
   }
 
-  private Node findNode(long key) {
+  static Node findNode(Node heads, long key) {
     int h = MAX_HEIGHT - 1;
     var p = heads;
     while (h >= 0 && p.next[h] == null) {
