@@ -62,7 +62,7 @@ public class LongKeyAaTree<V> implements LongKeyTree<V> {
     return null;
   }
 
-  private Node putRecStep(Node node, long key, T value) {
+  private Node putRecStep(Node node, long key, V value) {
     if (node == null) {
       size++;
       return new Node(key, value);
