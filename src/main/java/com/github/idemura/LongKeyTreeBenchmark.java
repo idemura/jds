@@ -30,7 +30,7 @@ public class LongKeyTreeBenchmark {
   @State(Scope.Thread)
   public static class RemoveState {
     public ArrayList<Long> shuffledKeys;
-    public LongKeyTree<String> aaTree;
+    public LongKeyMap<String> aaTree;
     public TreeMap<Long, String> treeMap;
 
     @Setup(Level.Invocation)

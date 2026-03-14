@@ -1,6 +1,6 @@
 package com.github.idemura;
 
-public interface LongKeyTree<T> {
+public interface LongKeyMap<T> {
   int size();
 
   T get(long key);

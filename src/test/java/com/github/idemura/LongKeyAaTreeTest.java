@@ -7,9 +7,9 @@ import java.util.Collections;
 import java.util.Random;
 
 class LongKeyAaTreeTest {
-  private final LongKeyTree<String> tree = createTree();
+  private final LongKeyMap<String> tree = createTree();
 
-  private static LongKeyTree<String> createTree() {
+  private static LongKeyMap<String> createTree() {
     return new LongKeyAaTree<>();
   }
 

@@ -1,6 +1,6 @@
 package com.github.idemura;
 
-public class LongKeyAaTree<V> implements LongKeyTree<V> {
+public class LongKeyAaTree<V> implements LongKeyMap<V> {
   static class Node {
     Long key; // Boxing for fair benchmark.
     int depth;
