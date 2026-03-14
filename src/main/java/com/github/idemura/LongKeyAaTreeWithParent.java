@@ -1,15 +1,15 @@
 package com.github.idemura;
 
-public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
-  static class Node<T> {
+public class LongKeyAaTreeWithParent<V> implements LongKeyTree<V> {
+  static class Node {
     Long key; // Boxing for fair benchmark.
     int depth;
-    T value;
-    Node<T> parent;
-    Node<T> left;
-    Node<T> right;
+    Object value;
+    Node parent;
+    Node left;
+    Node right;
 
-    Node(long key, T value, Node<T> parent) {
+    Node(long key, Object value, Node parent) {
       this.key = key;
       this.depth = 1;
       this.value = value;
@@ -17,7 +17,7 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     }
   }
 
-  private Node<T> root;
+  private Node root;
   private int size;
 
   public LongKeyAaTreeWithParent() {}
@@ -26,14 +26,14 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     return size;
   }
 
-  public T get(long key) {
+  public V get(long key) {
     var node = findNode(key);
-    return node == null ? null : node.value;
+    return node == null ? null : (V) node.value;
   }
 
-  public void put(long key, T value) {
+  public void put(long key, V value) {
     if (root == null) {
-      root = new Node<>(key, value, null);
+      root = new Node(key, value, null);
       size++;
       return;
     }
@@ -42,13 +42,13 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     while (true) {
       if (key < node.key) {
         if (node.left == null) {
-          node.left = new Node<>(key, value, node);
+          node.left = new Node(key, value, node);
           break;
         }
         node = node.left;
       } else if (key > node.key) {
         if (node.right == null) {
-          node.right = new Node<>(key, value, node);
+          node.right = new Node(key, value, node);
           break;
         }
         node = node.right;
@@ -79,7 +79,7 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     verifyAaRec(root);
   }
 
-  private Node<T> findNode(long key) {
+  private Node findNode(long key) {
     var node = root;
     while (node != null) {
       if (key < node.key) {
@@ -93,7 +93,7 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     return null;
   }
 
-  private void rebalanceAfterInsert(Node<T> node) {
+  private void rebalanceAfterInsert(Node node) {
     int sameCount = 0;
     while (node != null) {
       var parent = node.parent;
@@ -120,7 +120,7 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     }
   }
 
-  private Node<T> removeRecStep(Node<T> node, long key) {
+  private Node removeRecStep(Node node, long key) {
     if (node == null) {
       // Key not found.
       return null;
@@ -157,7 +157,7 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     }
   }
 
-  static <T> Node<T> rebalanceAfterDeleteLeft(Node<T> node) {
+  static Node rebalanceAfterDeleteLeft(Node node) {
     if (getDepth(node.left) < node.depth - 1) {
       // Consider two cases: right and right-right.
       int d = node.depth--;
@@ -175,7 +175,7 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     return node;
   }
 
-  static <T> Node<T> rebalanceAfterDeleteRight(Node<T> node) {
+  static Node rebalanceAfterDeleteRight(Node node) {
     if (getDepth(node.right) < node.depth - 1) {
       node.depth--;
       var top = skew(node);
@@ -187,7 +187,7 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     return node;
   }
 
-  static <T> void verifySearchTreeRec(Node<T> node, Long minKeyExclusive, Long maxKeyExclusive) {
+  static void verifySearchTreeRec(Node node, Long minKeyExclusive, Long maxKeyExclusive) {
     if (node == null) {
       return;
     }
@@ -201,7 +201,7 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     verifySearchTreeRec(node.right, node.key, maxKeyExclusive);
   }
 
-  static <T> void verifyAaRec(Node<T> node) {
+  static void verifyAaRec(Node node) {
     if (node == null) {
       return;
     }
@@ -229,14 +229,14 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     verifyAaRec(node.right);
   }
 
-  static <T> int countRec(Node<T> node) {
+  static int countRec(Node node) {
     if (node == null) {
       return 0;
     }
     return countRec(node.left) + countRec(node.right) + 1;
   }
 
-  static <T> void verifyParentRec(Node<T> node, Node<T> expectedParent) {
+  static void verifyParentRec(Node node, Node expectedParent) {
     if (node == null) {
       return;
     }
@@ -247,11 +247,11 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     verifyParentRec(node.right, node);
   }
 
-  static <T> int getDepth(Node<T> node) {
+  static int getDepth(Node node) {
     return node == null ? 0 : node.depth;
   }
 
-  static <T> Node<T> findPredecessor(Node<T> node) {
+  static Node findPredecessor(Node node) {
     if (node.left == null) {
       return null;
     }
@@ -266,7 +266,7 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     return new IllegalArgumentException(message.formatted(args));
   }
 
-  private static <T> void replaceChild(Node<T> parent, Node<T> oldChild, Node<T> newChild) {
+  private static void replaceChild(Node parent, Node oldChild, Node newChild) {
     if (parent == null) {
       return;
     }
@@ -280,14 +280,14 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     newChild.parent = parent;
   }
 
-  static <T> Node<T> skew(Node<T> node) {
+  static Node skew(Node node) {
     if (getDepth(node.left) == node.depth) {
       return promoteLeft(node);
     }
     return node;
   }
 
-  static <T> Node<T> split(Node<T> node) {
+  static Node split(Node node) {
     if (node.right != null && getDepth(node.right.right) == node.depth) {
       node = promoteRight(node);
       node.depth++;
@@ -296,7 +296,7 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     return node;
   }
 
-  static <T> Node<T> promoteLeft(Node<T> node) {
+  static Node promoteLeft(Node node) {
     var left = node.left;
     left.parent = node.parent;
     node.left = left.right;
@@ -308,7 +308,7 @@ public class LongKeyAaTreeWithParent<T> implements LongKeyTree<T> {
     return left;
   }
 
-  static <T> Node<T> promoteRight(Node<T> node) {
+  static Node promoteRight(Node node) {
     var right = node.right;
     right.parent = node.parent;
     node.right = right.left;
