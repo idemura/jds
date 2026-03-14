@@ -1,12 +1,14 @@
 package com.github.idemura;
 
+import java.util.Random;
+
 public class SkipList<V> {
-  private static class Node {
-    final int key;
-    final Node[] next;
+  static class Node {
+    long key;
+    Node[] next;
     Object value;
 
-    Node(int key, Object value, int n) {
+    Node(long key, Object value, int n) {
       this.key = key;
       this.value = value;
       this.next = new Node[n];
@@ -15,20 +17,20 @@ public class SkipList<V> {
 
   private static final int MAX_HEIGHT = 12;
 
-  private int rngState;
-  private final Node root;
+  private final Random random;
+  private final Node heads;
 
   SkipList() {
-    this(13);
+    this(new Random(1));
   }
 
-  SkipList(int seed) {
-    this.rngState = seed;
-    this.root = new Node(0, null, MAX_HEIGHT);
+  SkipList(Random random) {
+    this.random = random;
+    this.heads = new Node(0, null, MAX_HEIGHT);
   }
 
   private int random() {
-    return (rngState = (rngState * 1103515245 + 12345) & 0x7fffffff);
+    return random.nextInt(Integer.MAX_VALUE);
   }
 
   private int randomHeight() {
@@ -52,8 +54,8 @@ public class SkipList<V> {
     var newNode = new Node(key, value, h);
 
     h--; // 0-based index
-    var p = root;
-    for (; ; ) {
+    var p = heads;
+    while (true) {
       boolean levelDown = false;
       if (p.next[h] == null) {
         // We are at the end of the list. Insert and move to the level below.
@@ -92,11 +94,11 @@ public class SkipList<V> {
   String toDebugString() {
     var sb = new StringBuilder();
     for (int i = 0; i < MAX_HEIGHT; i++) {
-      if (root.next[i] == null) {
+      if (heads.next[i] == null) {
         break;
       }
       sb.append("L").append(i).append(": ");
-      for (var p = root.next[i]; p != null; p = p.next[i]) {
+      for (var p = heads.next[i]; p != null; p = p.next[i]) {
         sb.append(p.key).append("(").append(p.value).append(") ");
       }
       sb.append("\n");
@@ -106,7 +108,7 @@ public class SkipList<V> {
 
   private Node findNode(int key) {
     int h = MAX_HEIGHT - 1;
-    var p = root;
+    var p = heads;
     while (h >= 0 && p.next[h] == null) {
       h--;
     }
