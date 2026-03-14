@@ -1,16 +1,16 @@
 package com.github.idemura;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
-class SkipListTest {
+class LongKeySkipListTest {
   @Test
   void insertAndPut1() {
-    var sl = new SkipList<Integer>();
+    var sl = new LongKeySkipList<Integer>();
     sl.put(200, 1);
     Assertions.assertEquals(1, sl.get(200));
     sl.put(250, 2);
@@ -28,7 +28,7 @@ class SkipListTest {
   @Test
   void longTest16() {
     var keys = List.of(18, 16, 17, 63, 89, 14, 36, 54, 78, 37, 70, 30, 37, 23, 54, 69);
-    var sl = new SkipList<Integer>();
+    var sl = new LongKeySkipList<Integer>();
     Map<Integer, Integer> expected = new HashMap<>();
     for (int i = 0; i < keys.size(); i++) {
       expected.put(keys.get(i), i);
@@ -41,7 +41,7 @@ class SkipListTest {
   void stressTest() {
     final int n = 120;
     var rg = new Random();
-    var sl = new SkipList<Integer>();
+    var sl = new LongKeySkipList<Integer>();
     Map<Integer, Integer> expected = new HashMap<>();
     for (int i = 0; i < n; i++) {
       int k = rg.nextInt(120);
@@ -51,7 +51,7 @@ class SkipListTest {
     verifyMaps(expected, sl);
   }
 
-  private static void verifyMaps(Map<Integer, Integer> expected, SkipList<Integer> sl) {
+  private static void verifyMaps(Map<Integer, Integer> expected, LongKeySkipList<Integer> sl) {
     for (var k : expected.keySet()) {
       Assertions.assertEquals(expected.get(k), sl.get(k), "key=" + k);
     }

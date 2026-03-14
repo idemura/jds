@@ -2,7 +2,7 @@ package com.github.idemura;
 
 import java.util.Random;
 
-public class SkipList<V> {
+public class LongKeySkipList<V> {
   static class Node {
     long key;
     Node[] next;
@@ -20,28 +20,24 @@ public class SkipList<V> {
   private final Random random;
   private final Node heads;
 
-  SkipList() {
+  LongKeySkipList() {
     this(new Random(1));
   }
 
-  SkipList(Random random) {
+  LongKeySkipList(Random random) {
     this.random = random;
     this.heads = new Node(0, null, MAX_HEIGHT);
   }
 
-  private int random() {
-    return random.nextInt(Integer.MAX_VALUE);
-  }
-
   private int randomHeight() {
     int h = 1;
-    while (h < MAX_HEIGHT && random() % 4 == 0) {
+    while (h < MAX_HEIGHT && random.nextInt(4) == 0) {
       h++;
     }
     return h;
   }
 
-  public void put(int key, V value) {
+  public void put(long key, V value) {
     // Check if we replace the value
     var keyNode = findNode(key);
     if (keyNode != null) {
@@ -86,7 +82,7 @@ public class SkipList<V> {
     }
   }
 
-  public V get(int key) {
+  public V get(long key) {
     var keyNode = findNode(key);
     return keyNode == null ? null : (V) keyNode.value;
   }
@@ -106,7 +102,7 @@ public class SkipList<V> {
     return sb.toString();
   }
 
-  private Node findNode(int key) {
+  private Node findNode(long key) {
     int h = MAX_HEIGHT - 1;
     var p = heads;
     while (h >= 0 && p.next[h] == null) {
