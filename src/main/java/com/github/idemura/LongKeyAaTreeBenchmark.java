@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 1, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(3)
-public class LongKeyTreeBenchmark {
+public class LongKeyAaTreeBenchmark {
   private static final int SIZE = 100_000;
   private static final int SEED = 1;
 
