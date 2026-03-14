@@ -1,6 +1,7 @@
 package com.github.idemura;
 
 import java.util.Random;
+import java.util.random.RandomGenerator;
 
 public class LongKeySkipList<V> {
   static class Node {
@@ -17,14 +18,14 @@ public class LongKeySkipList<V> {
 
   private static final int MAX_HEIGHT = 12;
 
-  private final Random random;
+  private final RandomGenerator random;
   private final Node heads;
 
   LongKeySkipList() {
     this(new Random(1));
   }
 
-  LongKeySkipList(Random random) {
+  LongKeySkipList(RandomGenerator random) {
     this.random = random;
     this.heads = new Node(0, null, MAX_HEIGHT);
   }
