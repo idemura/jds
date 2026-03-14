@@ -11,36 +11,32 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 1, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
+@Fork(3)
 public class LongKeyTreeBenchmark {
-  private static final long seed = 1;
+  private static final int SIZE = 100_000;
+  private static final int SEED = 1;
 
   @State(Scope.Thread)
   public static class InsertState {
-    @Param({"100000"})
-    public int size;
-
     public ArrayList<Long> keys;
 
     @Setup(Level.Trial)
     public void setup() {
-      var random = new Random(seed);
-      keys = makeKeys(random, size);
+      var random = new Random(SEED);
+      keys = makeKeys(random, SIZE);
     }
   }
 
   @State(Scope.Thread)
   public static class RemoveState {
-    @Param({"100000"})
-    public int size;
-
     public ArrayList<Long> shuffledKeys;
     public LongKeyTree<String> aaTree;
     public TreeMap<Long, String> treeMap;
 
     @Setup(Level.Invocation)
     public void setup() {
-      var random = new Random(seed);
-      var keys = makeKeys(random, size);
+      var random = new Random(SEED);
+      var keys = makeKeys(random, SIZE);
       shuffledKeys = new ArrayList<>(keys);
       Collections.shuffle(shuffledKeys, random);
 
@@ -71,21 +67,21 @@ public class LongKeyTreeBenchmark {
     return tree;
   }
 
-  @Benchmark
-  public Object aaTreeRemove(RemoveState state) {
-    for (long key : state.shuffledKeys) {
-      state.aaTree.remove(key);
-    }
-    return state.aaTree;
-  }
-
-  @Benchmark
-  public Object treeMapRemove(RemoveState state) {
-    for (long key : state.shuffledKeys) {
-      state.treeMap.remove(key);
-    }
-    return state.treeMap;
-  }
+  // @Benchmark
+  // public Object aaTreeRemove(RemoveState state) {
+  //   for (long key : state.shuffledKeys) {
+  //     state.aaTree.remove(key);
+  //   }
+  //   return state.aaTree;
+  // }
+  //
+  // @Benchmark
+  // public Object treeMapRemove(RemoveState state) {
+  //   for (long key : state.shuffledKeys) {
+  //     state.treeMap.remove(key);
+  //   }
+  //   return state.treeMap;
+  // }
 
   private static ArrayList<Long> makeKeys(Random random, int size) {
     var keys = new ArrayList<Long>(size);
