@@ -1,8 +1,9 @@
 package com.github.idemura;
 
 import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.Test;
+
 import java.util.List;
+import org.junit.jupiter.api.Test;
 
 class LongKeySkipListTest {
   private static LongKeyMap<String> createSkipList() {
