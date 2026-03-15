@@ -68,10 +68,10 @@ Since `i >>> 1` shifts the index right by one bit, each bit of `i >>> 1` tells u
 corresponding bit run should be flipped. XOR-ing `i` with `i >>> 1` applies exactly that
 transformation.
 
-So the efficient Gray-code function is:
+So the efficient Gray-code conversion is:
 
 ```java
-long getGrayCode(long i) {
+long toGrayCode(long i) {
   return i ^ (i >>> 1);
 }
 ```
