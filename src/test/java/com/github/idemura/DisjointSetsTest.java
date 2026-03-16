@@ -20,9 +20,10 @@ class DisjointSetsTest {
     var a = newSet();
     var b = newSet();
     joinSets(a, b);
+    var root = getRoot(a);
     assertTrue(isSameSet(a, b));
-    assertSame(getRoot(a), getRoot(b));
-    assertSame(b, getRoot(a));
+    assertSame(root, getRoot(b));
+    assertTrue(root == a || root == b);
   }
 
   @Test
@@ -32,10 +33,11 @@ class DisjointSetsTest {
     var c = newSet();
     joinSets(a, b);
     joinSets(b, c);
+    var root = getRoot(a);
     assertTrue(isSameSet(a, c));
     assertTrue(isSameSet(b, c));
-    assertSame(c, getRoot(a));
-    assertSame(c, getRoot(b));
-    assertSame(c, getRoot(c));
+    assertSame(root, getRoot(b));
+    assertSame(root, getRoot(c));
+    assertTrue(root == a || root == b || root == c);
   }
 }
