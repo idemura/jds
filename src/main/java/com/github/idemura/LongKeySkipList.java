@@ -40,7 +40,6 @@ public class LongKeySkipList<V> implements LongKeyMap<V> {
   public void put(long key, V value) {
     var prev = new Node[maxHeight][];
     var p = heads;
-
     // Walk from the highest level down once, collecting insertion predecessors.
     for (int h = maxHeight - 1; h >= 0; h--) {
       while (p[h] != null && p[h].key < key) {
@@ -48,21 +47,18 @@ public class LongKeySkipList<V> implements LongKeyMap<V> {
       }
       prev[h] = p;
     }
-
     // At level 0 we can tell whether this is an update or a true insert.
     var next0 = prev[0][0];
     if (next0 != null && next0.key == key) {
       next0.value = value;
       return;
     }
-
     int h = randomHeight();
     var newNode = new Node(key, value, h);
     for (int i = 0; i < h; i++) {
       newNode.next[i] = prev[i][i];
       prev[i][i] = newNode;
     }
-
     size++;
   }
 

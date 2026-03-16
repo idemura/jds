@@ -39,7 +39,6 @@ public class LongKeyAaTreeBenchmark {
       var keys = makeKeys(random, SIZE);
       shuffledKeys = new ArrayList<>(keys);
       Collections.shuffle(shuffledKeys, random);
-
       aaTree = new LongKeyAaTree<>();
       treeMap = new TreeMap<>();
       for (long key : keys) {

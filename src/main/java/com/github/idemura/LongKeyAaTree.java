@@ -67,7 +67,6 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
       size++;
       return new Node(key, value);
     }
-
     if (key < node.key) {
       node.left = putRecStep(node.left, key, value);
     } else if (key > node.key) {
@@ -76,7 +75,6 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
       node.value = value;
       return node;
     }
-
     // AA-tree rebalancing after recursive insert:
     // 1) skew: fix left child rule violation,
     // 2) split: fix right-right grand child rule violation.
@@ -94,7 +92,6 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
       // Key not found.
       return null;
     }
-
     if (key <= node.key) {
       if (key == node.key) {
         // If node doesn't have left child, delete it. Otherwise, find the predecessor and copy
@@ -168,23 +165,19 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
     if (node.depth < 1) {
       throw newVerificationException("Invalid depth at key=%d", node.key);
     }
-
     // Left child must be exactly one level lower.
     if (getDepth(node.left) != node.depth - 1) {
       throw newVerificationException("Invalid left depth at key=%d", node.key);
     }
-
     // Right child must be at same level or one lower.
     int rightDepth = getDepth(node.right);
     if (rightDepth != node.depth && rightDepth != node.depth - 1) {
       throw newVerificationException("Invalid right depth at key=%d", node.key);
     }
-
     // Right-right child cannot be on the same level as node.
     if (getDepth(node.right == null ? null : node.right.right) >= node.depth) {
       throw newVerificationException("Invalid right-right depth at key=%d", node.key);
     }
-
     verifyAaRec(node.left);
     verifyAaRec(node.right);
   }
