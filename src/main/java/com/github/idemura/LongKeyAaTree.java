@@ -1,5 +1,7 @@
 package com.github.idemura;
 
+import static com.github.idemura.IdExceptions.verificationError;
+
 public class LongKeyAaTree<V> implements LongKeyMap<V> {
   static class Node {
     Long key; // Boxing for fair benchmark.
@@ -42,7 +44,7 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
   public void verify() {
     int actualSize = countRec(root);
     if (actualSize != size) {
-      throw new VerificationException("Size mismatch: expected=%d, actual=%d", size, actualSize);
+      throw verificationError("Size mismatch: expected=%d, actual=%d", size, actualSize);
     }
     verifySearchTreeRec(root, null, null);
     verifyAaRec(root);
@@ -149,10 +151,10 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
       return;
     }
     if (minKeyExclusive != null && node.key <= minKeyExclusive) {
-      throw new VerificationException("BST violation at key=%d", node.key);
+      throw verificationError("BST violation at key=%d", node.key);
     }
     if (maxKeyExclusive != null && node.key >= maxKeyExclusive) {
-      throw new VerificationException("BST violation at key=%d", node.key);
+      throw verificationError("BST violation at key=%d", node.key);
     }
     verifySearchTreeRec(node.left, minKeyExclusive, node.key);
     verifySearchTreeRec(node.right, node.key, maxKeyExclusive);
@@ -163,20 +165,20 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
       return;
     }
     if (node.depth < 1) {
-      throw new VerificationException("Invalid depth at key=%d", node.key);
+      throw verificationError("Invalid depth at key=%d", node.key);
     }
     // Left child must be exactly one level lower.
     if (getDepth(node.left) != node.depth - 1) {
-      throw new VerificationException("Invalid left depth at key=%d", node.key);
+      throw verificationError("Invalid left depth at key=%d", node.key);
     }
     // Right child must be at same level or one lower.
     int rightDepth = getDepth(node.right);
     if (rightDepth != node.depth && rightDepth != node.depth - 1) {
-      throw new VerificationException("Invalid right depth at key=%d", node.key);
+      throw verificationError("Invalid right depth at key=%d", node.key);
     }
     // Right-right child cannot be on the same level as node.
     if (getDepth(node.right == null ? null : node.right.right) >= node.depth) {
-      throw new VerificationException("Invalid right-right depth at key=%d", node.key);
+      throw verificationError("Invalid right-right depth at key=%d", node.key);
     }
     verifyAaRec(node.left);
     verifyAaRec(node.right);
