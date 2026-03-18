@@ -42,7 +42,7 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
   public void verify() {
     int actualSize = countRec(root);
     if (actualSize != size) {
-      throw newVerificationException("Size mismatch: expected=%d, actual=%d", size, actualSize);
+      throw new VerificationException("Size mismatch: expected=%d, actual=%d", size, actualSize);
     }
     verifySearchTreeRec(root, null, null);
     verifyAaRec(root);
@@ -149,10 +149,10 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
       return;
     }
     if (minKeyExclusive != null && node.key <= minKeyExclusive) {
-      throw newVerificationException("BST violation at key=%d", node.key);
+      throw new VerificationException("BST violation at key=%d", node.key);
     }
     if (maxKeyExclusive != null && node.key >= maxKeyExclusive) {
-      throw newVerificationException("BST violation at key=%d", node.key);
+      throw new VerificationException("BST violation at key=%d", node.key);
     }
     verifySearchTreeRec(node.left, minKeyExclusive, node.key);
     verifySearchTreeRec(node.right, node.key, maxKeyExclusive);
@@ -163,20 +163,20 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
       return;
     }
     if (node.depth < 1) {
-      throw newVerificationException("Invalid depth at key=%d", node.key);
+      throw new VerificationException("Invalid depth at key=%d", node.key);
     }
     // Left child must be exactly one level lower.
     if (getDepth(node.left) != node.depth - 1) {
-      throw newVerificationException("Invalid left depth at key=%d", node.key);
+      throw new VerificationException("Invalid left depth at key=%d", node.key);
     }
     // Right child must be at same level or one lower.
     int rightDepth = getDepth(node.right);
     if (rightDepth != node.depth && rightDepth != node.depth - 1) {
-      throw newVerificationException("Invalid right depth at key=%d", node.key);
+      throw new VerificationException("Invalid right depth at key=%d", node.key);
     }
     // Right-right child cannot be on the same level as node.
     if (getDepth(node.right == null ? null : node.right.right) >= node.depth) {
-      throw newVerificationException("Invalid right-right depth at key=%d", node.key);
+      throw new VerificationException("Invalid right-right depth at key=%d", node.key);
     }
     verifyAaRec(node.left);
     verifyAaRec(node.right);
@@ -202,10 +202,6 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
       node = node.right;
     }
     return node;
-  }
-
-  static IllegalArgumentException newVerificationException(String message, Object... args) {
-    return new IllegalArgumentException(message.formatted(args));
   }
 
   static Node skew(Node node) {
