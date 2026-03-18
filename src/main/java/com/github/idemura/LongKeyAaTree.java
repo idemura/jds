@@ -146,6 +146,13 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
     return node;
   }
 
+  static int countRec(Node node) {
+    if (node == null) {
+      return 0;
+    }
+    return countRec(node.left) + countRec(node.right) + 1;
+  }
+
   static void verifySearchTreeRec(Node node, Long minKeyExclusive, Long maxKeyExclusive) {
     if (node == null) {
       return;
@@ -182,13 +189,6 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
     }
     verifyAaRec(node.left);
     verifyAaRec(node.right);
-  }
-
-  static int countRec(Node node) {
-    if (node == null) {
-      return 0;
-    }
-    return countRec(node.left) + countRec(node.right) + 1;
   }
 
   static int getDepth(Node node) {
