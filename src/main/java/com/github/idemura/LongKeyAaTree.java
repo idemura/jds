@@ -44,7 +44,7 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
   public void verify() {
     int actualSize = countRec(root);
     if (actualSize != size) {
-      throw verificationError("Size mismatch: expected=%d, actual=%d", size, actualSize);
+      throw verificationError("Size mismatch");
     }
     verifySearchTreeRec(root, null, null);
     verifyAaRec(root);
@@ -151,10 +151,10 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
       return;
     }
     if (minKeyExclusive != null && node.key <= minKeyExclusive) {
-      throw verificationError("BST violation at key=%d", node.key);
+      throw verificationError("BST violation");
     }
     if (maxKeyExclusive != null && node.key >= maxKeyExclusive) {
-      throw verificationError("BST violation at key=%d", node.key);
+      throw verificationError("BST violation");
     }
     verifySearchTreeRec(node.left, minKeyExclusive, node.key);
     verifySearchTreeRec(node.right, node.key, maxKeyExclusive);
@@ -165,20 +165,20 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
       return;
     }
     if (node.depth < 1) {
-      throw verificationError("Invalid depth at key=%d", node.key);
+      throw verificationError("Invalid depth");
     }
     // Left child must be exactly one level lower.
     if (getDepth(node.left) != node.depth - 1) {
-      throw verificationError("Invalid left depth at key=%d", node.key);
+      throw verificationError("Violated left child property");
     }
     // Right child must be at same level or one lower.
     int rightDepth = getDepth(node.right);
     if (rightDepth != node.depth && rightDepth != node.depth - 1) {
-      throw verificationError("Invalid right depth at key=%d", node.key);
+      throw verificationError("Violated right child property");
     }
     // Right-right child cannot be on the same level as node.
     if (getDepth(node.right == null ? null : node.right.right) >= node.depth) {
-      throw verificationError("Invalid right-right depth at key=%d", node.key);
+      throw verificationError("Violated right-right child property");
     }
     verifyAaRec(node.left);
     verifyAaRec(node.right);
