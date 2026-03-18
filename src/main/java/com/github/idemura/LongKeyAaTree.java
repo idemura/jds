@@ -27,7 +27,7 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
   }
 
   public V get(long key) {
-    var node = findNode(key);
+    var node = findNode(root, key);
     return node == null ? null : (V) node.value;
   }
 
@@ -50,7 +50,7 @@ public class LongKeyAaTree<V> implements LongKeyMap<V> {
     verifyAaRec(root);
   }
 
-  private Node findNode(long key) {
+  static Node findNode(Node root, long key) {
     var node = root;
     while (node != null) {
       if (key < node.key) {
