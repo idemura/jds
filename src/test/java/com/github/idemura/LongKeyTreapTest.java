@@ -1,0 +1,126 @@
+package com.github.idemura;
+
+import static com.github.idemura.LongKeyMapRandomizedTests.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Random;
+import java.util.random.RandomGenerator;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+class LongKeyTreapTest {
+  @Test
+  void testEmpty() {
+    var random = mock(RandomGenerator.class);
+
+    var tree = new LongKeyTreap<String>(random);
+    assertEquals(0, tree.size());
+    assertNull(tree.get(10));
+    tree.verify();
+  }
+
+  @Test
+  void test1Node() {
+    var random = mock(RandomGenerator.class);
+    doReturn(10).when(random).nextInt();
+
+    var tree = new LongKeyTreap<String>(random);
+    tree.put(50, "50");
+    assertEquals(1, tree.size());
+    assertEquals("50", tree.get(50));
+    assertNull(tree.get(40));
+    tree.verify();
+  }
+
+  @Test
+  void test2Nodes1() {
+    var random = mock(RandomGenerator.class);
+    doReturn(10, 5).when(random).nextInt();
+
+    var tree = new LongKeyTreap<String>(random);
+    tree.put(50, "50");
+    tree.put(70, "70");
+    assertEquals(2, tree.size());
+    assertEquals("50", tree.get(50));
+    assertEquals("70", tree.get(70));
+    assertNull(tree.get(40));
+    tree.verify();
+  }
+
+  @Test
+  void test2Nodes2() {
+    var random = mock(RandomGenerator.class);
+    doReturn(5, 10).when(random).nextInt();
+
+    var tree = new LongKeyTreap<String>(random);
+    tree.put(50, "50");
+    tree.put(70, "70");
+    assertEquals(2, tree.size());
+    assertEquals("50", tree.get(50));
+    assertEquals("70", tree.get(70));
+    assertNull(tree.get(40));
+    tree.verify();
+  }
+
+  @Test
+  void test3Nodes1() {
+    var random = mock(RandomGenerator.class);
+    doReturn(10, 5, 7).when(random).nextInt();
+
+    var tree = new LongKeyTreap<String>(random);
+    tree.put(50, "50");
+    tree.put(70, "70");
+    tree.put(60, "60");
+    assertEquals(3, tree.size());
+    assertEquals("50", tree.get(50));
+    assertEquals("60", tree.get(60));
+    assertEquals("70", tree.get(70));
+    tree.verify();
+  }
+
+  @Test
+  void test3Nodes2() {
+    var random = mock(RandomGenerator.class);
+    doReturn(10, 5, 12).when(random).nextInt();
+
+    var tree = new LongKeyTreap<String>(random);
+    tree.put(50, "50");
+    tree.put(70, "70");
+    tree.put(60, "60");
+    assertEquals(3, tree.size());
+    assertEquals("50", tree.get(50));
+    assertEquals("60", tree.get(60));
+    assertEquals("70", tree.get(70));
+    tree.verify();
+  }
+
+  @Test
+  void test3Nodes2UpdateValue() {
+    var random = mock(RandomGenerator.class);
+    doReturn(10, 5, 12, 100).when(random).nextInt();
+
+    var tree = new LongKeyTreap<String>(random);
+    tree.put(50, "50");
+    tree.put(70, "70");
+    tree.put(60, "60");
+    tree.put(60, "sixty");
+    assertEquals(3, tree.size());
+    assertEquals("50", tree.get(50));
+    assertEquals("sixty", tree.get(60));
+    assertEquals("70", tree.get(70));
+    tree.verify();
+  }
+
+  @Test
+  @Disabled("remove() is not implemented yet")
+  void testRandomizedSmallShapes() {
+    testSmallShapes(new LongKeyTreap<>(new Random(0)));
+  }
+
+  @Disabled("remove() is not implemented yet")
+  @Test
+  void testRandomizedInsertThenRemove() {
+    testInsertThenRemove(new LongKeyTreap<>(new Random(0)));
+  }
+}
