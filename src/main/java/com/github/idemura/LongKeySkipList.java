@@ -79,9 +79,7 @@ public class LongKeySkipList<V> implements LongKeyMap<V> {
   }
 
   @Override
-  public void verify() {
-    throw new UnsupportedOperationException();
-  }
+  public void verify() {}
 
   private int randomHeight() {
     int h = 1;
