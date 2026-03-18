@@ -1,6 +1,5 @@
 package com.github.idemura;
 
-import static com.github.idemura.LongKeyMapRandomizedTests.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -11,26 +10,9 @@ import org.junit.jupiter.api.Test;
 
 class LongKeyTreapTest {
   @Test
-  void testEmpty() {
-    var random = mock(RandomGenerator.class);
-
-    var tree = new LongKeyTreap<String>(random);
-    assertEquals(0, tree.size());
-    assertNull(tree.get(10));
-    tree.verify();
-  }
-
-  @Test
-  void test1Node() {
-    var random = mock(RandomGenerator.class);
-    doReturn(10).when(random).nextInt();
-
-    var tree = new LongKeyTreap<String>(random);
-    tree.put(50, "50");
-    assertEquals(1, tree.size());
-    assertEquals("50", tree.get(50));
-    assertNull(tree.get(40));
-    tree.verify();
+  void testBasic() {
+    LongKeyMapTestSuite.testEmpty(new LongKeyTreap<>(new Random(0)));
+    LongKeyMapTestSuite.testSingleKey(new LongKeyTreap<>(new Random(0)));
   }
 
   @Test
@@ -113,14 +95,13 @@ class LongKeyTreapTest {
   }
 
   @Test
-  @Disabled("remove() is not implemented yet")
   void testRandomizedSmallShapes() {
-    testSmallShapes(new LongKeyTreap<>(new Random(0)));
+    LongKeyMapTestSuite.testSmallShapes(new LongKeyTreap<>(new Random(0)));
   }
 
   @Disabled("remove() is not implemented yet")
   @Test
   void testRandomizedInsertThenRemove() {
-    testInsertThenRemove(new LongKeyTreap<>(new Random(0)));
+    LongKeyMapTestSuite.testInsertThenRemove(new LongKeyTreap<>(new Random(0)));
   }
 }

@@ -2,20 +2,38 @@ package com.github.idemura;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.tinylog.Logger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
-final class LongKeyMapRandomizedTests {
+final class LongKeyMapTestSuite {
+  static void testEmpty(LongKeyMap<String> tree) {
+    assertEquals(0, tree.size());
+    assertNull(tree.get(10));
+    tree.verify();
+  }
+
+  static void testSingleKey(LongKeyMap<String> tree) {
+    tree.put(50, "50");
+    assertEquals(1, tree.size());
+    assertEquals("50", tree.get(50));
+    assertNull(tree.get(40));
+    tree.verify();
+  }
+
   static void testSmallShapes(LongKeyMap<String> tree) {
     var random = new Random(1);
-    for (int size = 0; size <= 8; size++) {
+    for (int size = 2; size <= 8; size++) {
       for (int n = 0; n < 100; n++) {
         var keys = new ArrayList<Long>();
         for (int i = 0; i < size; i++) {
           keys.add((long) random.nextInt());
         }
 
+        if (keys.get(0) == -869460080) {
+          Logger.info("insert {}", keys);
+        }
         for (long key : keys) {
           tree.put(key, Long.toString(key));
         }

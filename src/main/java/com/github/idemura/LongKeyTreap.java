@@ -20,7 +20,7 @@ public class LongKeyTreap<V> implements LongKeyMap<V> {
 
     @Override
     public String toString() {
-      return "Node(key=%s rank=%d %s)".formatted(key, rank, value);
+      return "Node(key=%s rank=%d)".formatted(key, rank);
     }
   }
 

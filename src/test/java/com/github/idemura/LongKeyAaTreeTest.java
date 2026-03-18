@@ -1,52 +1,51 @@
 package com.github.idemura;
 
-import static com.github.idemura.LongKeyMapRandomizedTests.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
 class LongKeyAaTreeTest {
-  private final LongKeyMap<String> tree = createTree();
-
-  private static LongKeyMap<String> createTree() {
-    return new LongKeyAaTree<>();
-  }
-
-  private void put(long key) {
+  private static void put(LongKeyMap<String> tree, long key) {
     tree.put(key, Long.toString(key));
     tree.verify();
   }
 
-  private void remove(long key) {
+  private static void remove(LongKeyMap<String> tree, long key) {
     tree.remove(key);
     tree.verify();
   }
 
-  private void assertContains(long... keys) {
+  private static void assertContains(LongKeyMap<String> tree, long... keys) {
     for (long key : keys) {
       assertEquals(Long.toString(key), tree.get(key));
     }
   }
 
-  private void assertNotFound(long... keys) {
+  private static void assertNotFound(LongKeyMap<String> tree, long... keys) {
     for (long key : keys) {
       assertNull(tree.get(key));
     }
   }
 
   @Test
-  void testPrimitiveShapes() {
-    tree.verify();
-    assertEquals(0, tree.size());
-    put(50);
+  void testBasic() {
+    var tree = new LongKeyAaTree<String>();
+    LongKeyMapTestSuite.testEmpty(tree);
+    LongKeyMapTestSuite.testSingleKey(tree);
+  }
+
+  @Test
+  void testSkewSplit() {
+    var tree = new LongKeyAaTree<String>();
+    put(tree, 50);
     assertEquals(1, tree.size());
     assertEquals("50", tree.get(50));
     // Skew
-    put(40);
+    put(tree, 40);
     assertEquals("40", tree.get(40));
     assertEquals("50", tree.get(50));
     // Skew+split
-    put(30);
+    put(tree, 30);
     assertEquals("30", tree.get(30));
     assertEquals("40", tree.get(40));
     assertEquals("50", tree.get(50));
@@ -54,145 +53,151 @@ class LongKeyAaTreeTest {
 
   @Test
   void testRemoveRegression() {
-    put(0);
-    put(9);
-    remove(15);
-    remove(11);
-    put(19);
-    remove(17);
-    put(13);
-    put(15);
-    remove(4);
-    remove(1);
-    remove(3);
-    remove(4);
-    put(12);
-    remove(3);
-    remove(12);
-    put(5);
-    remove(17);
-    remove(2);
-    remove(5);
-    put(18);
-    put(0);
-    put(15);
-    put(18);
-    put(14);
-    remove(12);
-    remove(19);
-    put(16);
-    put(7);
-    put(8);
-    remove(3);
-    remove(7);
+    var tree = new LongKeyAaTree<String>();
+    put(tree, 0);
+    put(tree, 9);
+    remove(tree, 15);
+    remove(tree, 11);
+    put(tree, 19);
+    remove(tree, 17);
+    put(tree, 13);
+    put(tree, 15);
+    remove(tree, 4);
+    remove(tree, 1);
+    remove(tree, 3);
+    remove(tree, 4);
+    put(tree, 12);
+    remove(tree, 3);
+    remove(tree, 12);
+    put(tree, 5);
+    remove(tree, 17);
+    remove(tree, 2);
+    remove(tree, 5);
+    put(tree, 18);
+    put(tree, 0);
+    put(tree, 15);
+    put(tree, 18);
+    put(tree, 14);
+    remove(tree, 12);
+    remove(tree, 19);
+    put(tree, 16);
+    put(tree, 7);
+    put(tree, 8);
+    remove(tree, 3);
+    remove(tree, 7);
   }
 
   @Test
   void testRemoveMissingKeyKeepsTreeStable() {
-    put(40);
-    put(20);
-    put(60);
-    put(10);
-    put(30);
-    put(50);
-    put(70);
+    var tree = new LongKeyAaTree<String>();
+    put(tree, 40);
+    put(tree, 20);
+    put(tree, 60);
+    put(tree, 10);
+    put(tree, 30);
+    put(tree, 50);
+    put(tree, 70);
 
-    remove(999);
+    remove(tree, 999);
 
     assertEquals(7, tree.size());
-    assertContains(10, 20, 30, 40, 50, 60, 70);
+    assertContains(tree, 10, 20, 30, 40, 50, 60, 70);
   }
 
   @Test
   void testRemoveWithPredecessorReplacement() {
-    put(40);
-    put(20);
-    put(60);
-    put(10);
-    put(30);
-    put(50);
-    put(70);
-    put(25);
-    put(35);
+    var tree = new LongKeyAaTree<String>();
+    put(tree, 40);
+    put(tree, 20);
+    put(tree, 60);
+    put(tree, 10);
+    put(tree, 30);
+    put(tree, 50);
+    put(tree, 70);
+    put(tree, 25);
+    put(tree, 35);
 
-    remove(40);
+    remove(tree, 40);
 
     assertEquals(8, tree.size());
-    assertNotFound(40);
-    assertContains(10, 20, 25, 30, 35, 50, 60, 70);
+    assertNotFound(tree, 40);
+    assertContains(tree, 10, 20, 25, 30, 35, 50, 60, 70);
   }
 
   @Test
   void testRemoveTriggersLeftSideRebalance() {
-    put(40);
-    put(20);
-    put(60);
-    put(10);
-    put(30);
-    put(50);
-    put(70);
-    put(65);
-    put(80);
+    var tree = new LongKeyAaTree<String>();
+    put(tree, 40);
+    put(tree, 20);
+    put(tree, 60);
+    put(tree, 10);
+    put(tree, 30);
+    put(tree, 50);
+    put(tree, 70);
+    put(tree, 65);
+    put(tree, 80);
 
-    remove(10);
-    remove(20);
-    remove(30);
+    remove(tree, 10);
+    remove(tree, 20);
+    remove(tree, 30);
 
     assertEquals(6, tree.size());
-    assertNotFound(10, 20, 30);
-    assertContains(40, 50, 60, 65, 70, 80);
+    assertNotFound(tree, 10, 20, 30);
+    assertContains(tree, 40, 50, 60, 65, 70, 80);
   }
 
   @Test
   void testRemoveTriggersRightSideRebalance() {
-    put(40);
-    put(20);
-    put(60);
-    put(10);
-    put(30);
-    put(50);
-    put(70);
-    put(5);
-    put(15);
+    var tree = new LongKeyAaTree<String>();
+    put(tree, 40);
+    put(tree, 20);
+    put(tree, 60);
+    put(tree, 10);
+    put(tree, 30);
+    put(tree, 50);
+    put(tree, 70);
+    put(tree, 5);
+    put(tree, 15);
 
-    remove(70);
-    remove(60);
-    remove(50);
+    remove(tree, 70);
+    remove(tree, 60);
+    remove(tree, 50);
 
     assertEquals(6, tree.size());
-    assertNotFound(50, 60, 70);
-    assertContains(5, 10, 15, 20, 30, 40);
+    assertNotFound(tree, 50, 60, 70);
+    assertContains(tree, 5, 10, 15, 20, 30, 40);
   }
 
   @Test
   void testRemoveLeftSideRebalanceWithTallRightChild() {
-    put(50);
-    put(20);
-    put(70);
-    put(10);
-    put(30);
-    put(60);
-    put(80);
-    put(65);
-    put(90);
-    put(85);
+    var tree = new LongKeyAaTree<String>();
+    put(tree, 50);
+    put(tree, 20);
+    put(tree, 70);
+    put(tree, 10);
+    put(tree, 30);
+    put(tree, 60);
+    put(tree, 80);
+    put(tree, 65);
+    put(tree, 90);
+    put(tree, 85);
 
-    remove(10);
-    remove(20);
-    remove(30);
+    remove(tree, 10);
+    remove(tree, 20);
+    remove(tree, 30);
 
     assertEquals(7, tree.size());
-    assertNotFound(10, 20, 30);
-    assertContains(50, 60, 65, 70, 80, 85, 90);
+    assertNotFound(tree, 10, 20, 30);
+    assertContains(tree, 50, 60, 65, 70, 80, 85, 90);
   }
 
   @Test
   void testRandomizedSmallShapes() {
-    testSmallShapes(createTree());
+    LongKeyMapTestSuite.testSmallShapes(new LongKeyAaTree<>());
   }
 
   @Test
   void testRandomizedInsertThenRemove() {
-    testInsertThenRemove(createTree());
+    LongKeyMapTestSuite.testInsertThenRemove(new LongKeyAaTree<>());
   }
 }
