@@ -56,8 +56,8 @@ public class LongKeyTreap<V> implements LongKeyMap<V> {
       return;
     }
     var s = split(root, key);
-    var n = new Node(key, random.nextInt(), value);
-    root = merge(merge(s.left, n), s.right);
+    var newNode = new Node(key, random.nextInt(), value);
+    root = merge(merge(s.left, newNode), s.right);
     size++;
   }
 
@@ -169,7 +169,7 @@ public class LongKeyTreap<V> implements LongKeyMap<V> {
       left.right = merge(left.right, right);
       return left;
     } else {
-      right.left = merge(right.left, left);
+      right.left = merge(left, right.left);
       return right;
     }
   }

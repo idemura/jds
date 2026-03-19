@@ -2,7 +2,6 @@ package com.github.idemura;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.tinylog.Logger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -31,9 +30,6 @@ final class LongKeyMapTestSuite {
           keys.add((long) random.nextInt());
         }
 
-        if (keys.get(0) == -869460080) {
-          Logger.info("insert {}", keys);
-        }
         for (long key : keys) {
           tree.put(key, Long.toString(key));
         }
