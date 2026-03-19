@@ -14,10 +14,11 @@ import org.openjdk.jmh.annotations.*;
 @Fork(3)
 public class LongKeyMapBenchmark {
   private static final int SIZE = 100_000;
-  private static final int SEED = 1;
+  private static final int SEED = (int) System.nanoTime();
 
   static LongKeyMap<String> makeCustomTreeMap() {
     return new LongKeyAaTree<>();
+    // return new LongKeySkipList<>();
   }
 
   @State(Scope.Thread)
