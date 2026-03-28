@@ -7,15 +7,17 @@ import java.util.random.RandomGenerator;
 public class LongKeyTreap<V> implements LongKeyMap<V> {
   static class Node {
     Long key; // Boxing for fair benchmark.
-    int rank;
+    int rank; // Max heap by rank.
     Object value;
+    Node parent;
     Node left;
     Node right;
 
-    Node(long key, int rank, Object value) {
+    Node(long key, int rank, Object value, Node parent) {
       this.key = key;
       this.rank = rank;
       this.value = value;
+      this.parent = parent;
     }
 
     @Override
@@ -50,15 +52,34 @@ public class LongKeyTreap<V> implements LongKeyMap<V> {
 
   @Override
   public void put(long key, V value) {
-    var keyNode = findNode(root, key);
-    if (keyNode != null) {
-      keyNode.value = value;
-      return;
+    var node = root;
+    while (true) {
+      if (key < node.key) {
+        if (node.left == null) {
+          node = node.left = new Node(key, random.nextInt(), value, node);
+          break;
+        }
+        node = node.left;
+      } else if (key > node.key) {
+        if (node.right == null) {
+          node = node.right = new Node(key, random.nextInt(), value, node);
+          break;
+        }
+        node = node.right;
+      } else {
+        node.value = value;
+        return;
+      }
     }
-    var s = split(root, key);
-    var newNode = new Node(key, random.nextInt(), value);
-    root = merge(merge(s.left, newNode), s.right);
-    size++;
+      size++;
+  // Fix heap order using rotations.
+    while (node.parent != null) {
+      if (node.rank > node.parent.rank) {
+        promoteUp(node);
+      } else {
+        break;
+      }
+    }
   }
 
   @Override
@@ -86,6 +107,7 @@ public class LongKeyTreap<V> implements LongKeyMap<V> {
     }
     verifySearchTreeRec(root, null, null);
     verifyMaxHeapRec(root);
+    verifyParent(root, null);
   }
 
   static int countRec(Node node) {
@@ -125,6 +147,17 @@ public class LongKeyTreap<V> implements LongKeyMap<V> {
       }
       verifyMaxHeapRec(node.right);
     }
+  }
+
+  static void verifyParent(Node node, Node parent) {
+    if (node == null) {
+      return;
+    }
+    if (node.parent != parent) {
+      throw verificationError("Parent violated");
+    }
+    verifyParent(node.left, node);
+    verifyParent(node.right, node);
   }
 
   static Node findNode(Node root, long key) {
@@ -172,5 +205,31 @@ public class LongKeyTreap<V> implements LongKeyMap<V> {
       right.left = merge(left, right.left);
       return right;
     }
+  }
+
+  static void promoteUp(Node node) {
+    var parent = node.parent;
+    if (node == parent.left) {
+      parent.left = node.right;
+      if (node.right != null) {
+        node.right.parent = parent;
+      }
+      node.right = parent;
+    } else {
+      parent.right = node.left;
+      if (node.left != null) {
+        node.left.parent = parent;
+      }
+      node.left = parent;
+    }
+    var pp = parent.parent;
+    if (pp != null) {
+      if (parent == pp.left) {
+        pp.left = node;
+      } else {
+        pp.right = node;
+      }
+    }
+    parent.parent = node;
   }
 }
