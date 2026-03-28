@@ -15,18 +15,6 @@ class LongKeyAaTreeTest {
     tree.verify();
   }
 
-  private static void assertContains(LongKeyMap<String> tree, long... keys) {
-    for (long key : keys) {
-      assertEquals(Long.toString(key), tree.get(key));
-    }
-  }
-
-  private static void assertNotFound(LongKeyMap<String> tree, long... keys) {
-    for (long key : keys) {
-      assertNull(tree.get(key));
-    }
-  }
-
   @Test
   void testBasic() {
     var tree = new LongKeyAaTree<String>();
@@ -101,7 +89,13 @@ class LongKeyAaTreeTest {
     remove(tree, 999);
 
     assertEquals(7, tree.size());
-    assertContains(tree, 10, 20, 30, 40, 50, 60, 70);
+    assertEquals("10", tree.get(10));
+    assertEquals("20", tree.get(20));
+    assertEquals("30", tree.get(30));
+    assertEquals("40", tree.get(40));
+    assertEquals("50", tree.get(50));
+    assertEquals("60", tree.get(60));
+    assertEquals("70", tree.get(70));
   }
 
   @Test
@@ -120,8 +114,15 @@ class LongKeyAaTreeTest {
     remove(tree, 40);
 
     assertEquals(8, tree.size());
-    assertNotFound(tree, 40);
-    assertContains(tree, 10, 20, 25, 30, 35, 50, 60, 70);
+    assertNull(tree.get(40));
+    assertEquals("10", tree.get(10));
+    assertEquals("20", tree.get(20));
+    assertEquals("25", tree.get(25));
+    assertEquals("30", tree.get(30));
+    assertEquals("35", tree.get(35));
+    assertEquals("50", tree.get(50));
+    assertEquals("60", tree.get(60));
+    assertEquals("70", tree.get(70));
   }
 
   @Test
@@ -142,8 +143,15 @@ class LongKeyAaTreeTest {
     remove(tree, 30);
 
     assertEquals(6, tree.size());
-    assertNotFound(tree, 10, 20, 30);
-    assertContains(tree, 40, 50, 60, 65, 70, 80);
+    assertNull(tree.get(10));
+    assertNull(tree.get(20));
+    assertNull(tree.get(30));
+    assertEquals("40", tree.get(40));
+    assertEquals("50", tree.get(50));
+    assertEquals("60", tree.get(60));
+    assertEquals("65", tree.get(65));
+    assertEquals("70", tree.get(70));
+    assertEquals("80", tree.get(80));
   }
 
   @Test
@@ -164,8 +172,15 @@ class LongKeyAaTreeTest {
     remove(tree, 50);
 
     assertEquals(6, tree.size());
-    assertNotFound(tree, 50, 60, 70);
-    assertContains(tree, 5, 10, 15, 20, 30, 40);
+    assertNull(tree.get(50));
+    assertNull(tree.get(60));
+    assertNull(tree.get(70));
+    assertEquals("5", tree.get(5));
+    assertEquals("10", tree.get(10));
+    assertEquals("15", tree.get(15));
+    assertEquals("20", tree.get(20));
+    assertEquals("30", tree.get(30));
+    assertEquals("40", tree.get(40));
   }
 
   @Test
@@ -187,8 +202,16 @@ class LongKeyAaTreeTest {
     remove(tree, 30);
 
     assertEquals(7, tree.size());
-    assertNotFound(tree, 10, 20, 30);
-    assertContains(tree, 50, 60, 65, 70, 80, 85, 90);
+    assertNull(tree.get(10));
+    assertNull(tree.get(20));
+    assertNull(tree.get(30));
+    assertEquals("50", tree.get(50));
+    assertEquals("60", tree.get(60));
+    assertEquals("65", tree.get(65));
+    assertEquals("70", tree.get(70));
+    assertEquals("80", tree.get(80));
+    assertEquals("85", tree.get(85));
+    assertEquals("90", tree.get(90));
   }
 
   @Test
