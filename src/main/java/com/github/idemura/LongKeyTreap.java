@@ -44,6 +44,7 @@ public class LongKeyTreap<V> implements LongKeyMap<V> {
     return size;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public V get(long key) {
     var node = findNode(root, key);
@@ -52,34 +53,44 @@ public class LongKeyTreap<V> implements LongKeyMap<V> {
 
   @Override
   public void put(long key, V value) {
+    if (root == null) {
+      root = new Node(key, random.nextInt(), value, root);
+      size = 1;
+      return;
+    }
+    boolean left = true;
     var node = root;
-    while (true) {
+    var last = node.parent; // Null
+    while (node != null) {
+      last = node;
       if (key < node.key) {
-        if (node.left == null) {
-          node = node.left = new Node(key, random.nextInt(), value, node);
-          break;
-        }
         node = node.left;
+        left = true;
       } else if (key > node.key) {
-        if (node.right == null) {
-          node = node.right = new Node(key, random.nextInt(), value, node);
-          break;
-        }
         node = node.right;
+        left = false;
       } else {
         node.value = value;
         return;
       }
     }
-      size++;
-  // Fix heap order using rotations.
+    size++;
+    if (left) {
+      node = last.left = new Node(key, random.nextInt(), value, last);
+    } else {
+      node = last.right = new Node(key, random.nextInt(), value, last);
+    }
+    // Fix heap order using rotations.
     while (node.parent != null) {
       if (node.rank > node.parent.rank) {
         promoteUp(node);
       } else {
-        break;
+        // We recovered heap property and didn't reach the root.
+        return;
       }
     }
+    // Update the root.
+    root = node;
   }
 
   @Override
@@ -95,6 +106,9 @@ public class LongKeyTreap<V> implements LongKeyMap<V> {
       root = s.right;
     } else {
       root = merge(split(s.left, key - 1).left, s.right);
+    }
+    if (root != null) {
+      root.parent = null;
     }
     size--;
   }
@@ -181,12 +195,20 @@ public class LongKeyTreap<V> implements LongKeyMap<V> {
     if (key < node.key) {
       var s = split(node.left, key);
       node.left = s.right;
+      if (s.right != null) {
+        s.right.parent = node;
+      }
       s.right = node;
+      node.parent = null;
       return s;
     } else {
       var s = split(node.right, key);
       node.right = s.left;
+      if (s.left != null) {
+        s.left.parent = node;
+      }
       s.left = node;
+      node.parent = null;
       return s;
     }
   }
@@ -200,9 +222,15 @@ public class LongKeyTreap<V> implements LongKeyMap<V> {
     }
     if (left.rank >= right.rank) {
       left.right = merge(left.right, right);
+      if (left.right != null) {
+        left.right.parent = left;
+      }
       return left;
     } else {
       right.left = merge(left, right.left);
+      if (right.left != null) {
+        right.left.parent = right;
+      }
       return right;
     }
   }
@@ -223,6 +251,7 @@ public class LongKeyTreap<V> implements LongKeyMap<V> {
       node.left = parent;
     }
     var pp = parent.parent;
+    parent.parent = node;
     if (pp != null) {
       if (parent == pp.left) {
         pp.left = node;
@@ -230,6 +259,6 @@ public class LongKeyTreap<V> implements LongKeyMap<V> {
         pp.right = node;
       }
     }
-    parent.parent = node;
+    node.parent = pp;
   }
 }

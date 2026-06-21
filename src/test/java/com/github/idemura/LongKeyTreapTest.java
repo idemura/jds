@@ -1,11 +1,11 @@
 package com.github.idemura;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import org.junit.jupiter.api.Test;
 import java.util.Random;
 import java.util.random.RandomGenerator;
-import org.junit.jupiter.api.Test;
 
 class LongKeyTreapTest {
   @Test
@@ -51,7 +51,9 @@ class LongKeyTreapTest {
 
     var tree = new LongKeyTreap<String>(random);
     tree.put(50, "50");
+    tree.verify();
     tree.put(70, "70");
+    tree.verify();
     tree.put(60, "60");
     tree.verify();
     assertEquals(3, tree.size());
